@@ -45,10 +45,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late MQTTManager _manager = MQTTManager();
 
-  void ConnectMqtt() {
-    Future.delayed(const Duration(microseconds: 100), () => _manager.connect());
-    Future.delayed(const Duration(seconds: 4),
-        () => _manager.subScribeTo("B4E62DB826BD_U"));
+  void ConnectMqtt() async{
+    print("start");
+    await Future.delayed(const Duration(microseconds: 100), () => _manager.connect());
+    await Future.delayed(const Duration(seconds: 4),
+      ()=> _manager.subScribeTo("temp"));
     print(_manager.currentState.getAppConnectionState);
   }
 
@@ -77,32 +78,22 @@ class _MyHomePageState extends State<MyHomePage> {
     _manager = Provider.of<MQTTManager>(context);
     return SafeArea(
       child: Scaffold(
-        // appBar: AppBar(
-        //   title: Text(widget.title),
-        // ),
-        body: Column(
-          children: [
-            GaugeTemHu(
-                humi: _manager.currentState.gethum,
-                temp: _manager.currentState.gettemp),
-            CardControlDevice(
-              manager: _manager,
-              state_d1: _manager.currentState.getd1,
-              state_d2: _manager.currentState.getd2,
-              state_d3: _manager.currentState.getd3,
-              state_d4: _manager.currentState.getd4,
-            ),
-            VoltCurrentCard(
-              volgate: _manager.currentState.getvolt,
-              current: _manager.currentState.getcurrent,
-              power: _manager.currentState.getPower,
-            ),
-            // ElevatedButton(
-            //     onPressed: () {
-            //       _manager.subScribeTo("topic_test");
-            //     },
-            //     child: const Text("subrice")),
-          ],
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Center(
+          child: Column(
+            children: [         
+              Text(_manager.currentState.getReceivedText),
+              ElevatedButton(
+                  onPressed: () {
+                    print(0);
+                    _manager.subScribeTo("temp");
+                    print(1);
+                  },
+                  child: const Text("subrice")),
+            ],
+          ),
         ),
       ),
     );

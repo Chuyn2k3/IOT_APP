@@ -65,8 +65,10 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - access/icon/
-    - access/img/
     - access/font/
+    - access/mqtt_key/ca.pem
+    - access/mqtt_key/client.pem
+    - access/mqtt_key/client.key
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -1,6 +1,9 @@
 // ignore_for_file: depend_on_referenced_packages
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:flutter_esp/Service/MQTTAppState.dart';
@@ -8,14 +11,20 @@ import 'package:flutter_esp/Service/MQTTAppState.dart';
 class MQTTManager extends ChangeNotifier {
   // Private instance of client
   final MQTTAppState _currentState = MQTTAppState();
+  static const String address = "hub-uat.selex.vn";
+  static const int port = 8883;
+  static const String clientId = "chuyen";
+  String _topic = "temp";
+  String temp = "Đang kết nối";
+  final String userName = "selex";
+  final String password = "selex";
   final MqttServerClient _client =
-      MqttServerClient.withPort('103.101.162.184', 'flutter_test', 1883);
-  String _topic = "";
+      MqttServerClient.withPort(address, clientId, port);
 
-  void initializeMQTTClient() {
+  void initializeMQTTClient() async{
     // Save the values
     _client.keepAlivePeriod = 20;
-    _client.secure = false;
+    _client.secure = true;
     _client.autoReconnect = true;
     _client.pongCallback = pong;
     _client.logging(on: true);
@@ -25,11 +34,24 @@ class MQTTManager extends ChangeNotifier {
     _client.onConnected = onConnected;
     _client.onSubscribed = onSubscribed;
     _client.onUnsubscribed = onUnsubscribed;
+    // Tạo SecurityContext và nạp các file chứng chỉ
+    SecurityContext context = SecurityContext.defaultContext;
+
+    // Nạp file chứng chỉ
+
+    final caCertBytes = (await rootBundle.load('access/mqtt_key/ca.pem')).buffer.asUint8List();
+  final clientCertBytes = (await rootBundle.load('access/mqtt_key/client.pem')).buffer.asUint8List();
+  final clientKeyBytes = (await rootBundle.load('access/mqtt_key/client.key')).buffer.asUint8List();
+
+  // Thiết lập chứng chỉ với Uint8List
+  context.setTrustedCertificatesBytes(caCertBytes); // CA Certificate
+  context.useCertificateChainBytes(clientCertBytes); // Client Certificate
+  context.usePrivateKeyBytes(clientKeyBytes); // Private Key
 
     final connMess = MqttConnectMessage()
-        .withClientIdentifier("flutter_test")
-        .authenticateAs("test", "test")
-        .withWillTopic('willtopic')
+        .withClientIdentifier(clientId)
+        .authenticateAs(userName, password)
+        .withWillTopic('temp')
         .withWillMessage('My Will message')
         .startClean()
         .withWillQos(MqttQos.atLeastOnce);
