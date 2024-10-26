@@ -53,15 +53,15 @@ class MQTTAppState {
   void setReceivedText(String text) {
     _receivedText = text;
     // _historyText = _historyText + '\n' + _receivedText;
-    final json = jsonDecode(text);
-    final sensor = Sensor.fromJson(json);
-    data = sensor.data;
-    hum = sensor.temp[1];
-    temp = sensor.temp[0];
-    volt = sensor.volt[0];
-    current = sensor.volt[1];
-    power = roundDouble((volt * current) / 1000, 5);
-    ConvertToBool(data);
+    // final json = jsonDecode(text);
+    // final sensor = Sensor.fromJson(json);
+    // data = sensor.data;
+    // hum = sensor.temp[1];
+    // temp = sensor.temp[0];
+    // volt = sensor.volt[0];
+    // current = sensor.volt[1];
+    // power = roundDouble((volt * current) / 1000, 5);
+    // ConvertToBool(data);
   }
 
   void setAppConnectionState(MQTTAppConnectionState state) {

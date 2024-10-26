@@ -83,12 +83,16 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         body: Center(
           child: Column(
-            children: [         
-              Text(_manager.currentState.getReceivedText),
+            children: [
+              Consumer<MQTTManager>(
+              builder: (context, manager, child) {
+                return Text(manager.currentState.getReceivedText); // Hiển thị giá trị temp
+              },
+            ),
               ElevatedButton(
                   onPressed: () {
                     print(0);
-                    _manager.subScribeTo("temp");
+                    _manager.connect();
                     print(1);
                   },
                   child: const Text("subrice")),

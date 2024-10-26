@@ -21,7 +21,7 @@ class MQTTManager extends ChangeNotifier {
   final MqttServerClient _client =
       MqttServerClient.withPort(address, clientId, port);
 
-  void initializeMQTTClient() async{
+  void initializeMQTTClient() async {
     // Save the values
     _client.keepAlivePeriod = 20;
     _client.secure = true;
@@ -39,20 +39,26 @@ class MQTTManager extends ChangeNotifier {
 
     // Nạp file chứng chỉ
 
-    final caCertBytes = (await rootBundle.load('access/mqtt_key/ca.pem')).buffer.asUint8List();
-  final clientCertBytes = (await rootBundle.load('access/mqtt_key/client.pem')).buffer.asUint8List();
-  final clientKeyBytes = (await rootBundle.load('access/mqtt_key/client.key')).buffer.asUint8List();
+    final caCertBytes =
+        (await rootBundle.load('access/mqtt_key/ca.pem')).buffer.asUint8List();
+    final clientCertBytes =
+        (await rootBundle.load('access/mqtt_key/client.pem'))
+            .buffer
+            .asUint8List();
+    final clientKeyBytes = (await rootBundle.load('access/mqtt_key/client.key'))
+        .buffer
+        .asUint8List();
 
-  // Thiết lập chứng chỉ với Uint8List
-  context.setTrustedCertificatesBytes(caCertBytes); // CA Certificate
-  context.useCertificateChainBytes(clientCertBytes); // Client Certificate
-  context.usePrivateKeyBytes(clientKeyBytes); // Private Key
+    // Thiết lập chứng chỉ với Uint8List
+    context.setTrustedCertificatesBytes(caCertBytes); // CA Certificate
+    context.useCertificateChainBytes(clientCertBytes); // Client Certificate
+    context.usePrivateKeyBytes(clientKeyBytes); // Private Key
 
     final connMess = MqttConnectMessage()
         .withClientIdentifier(clientId)
         .authenticateAs(userName, password)
-        .withWillTopic('temp')
-        .withWillMessage('My Will message')
+        // .withWillTopic('temp')
+        // .withWillMessage('chuyen test message')
         .startClean()
         .withWillQos(MqttQos.atLeastOnce);
     print('EXAMPLE::Mosquitto client connecting....');
@@ -120,10 +126,14 @@ class MQTTManager extends ChangeNotifier {
     _currentState.setAppConnectionState(MQTTAppConnectionState.connected);
     updateState();
     print('EXAMPLE::Mosquitto client connected....');
+    //print("start_set_value");
     _client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
       final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
+      print("start_set_value");
       final String pt =
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+      print(pt);
+      print("ok");
       _currentState.setReceivedText(pt);
       updateState();
       print(
